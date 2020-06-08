@@ -1,0 +1,76 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+
+android {
+    compileSdkVersion 29
+    buildToolsVersion "29.0.3"
+
+    defaultConfig {
+        applicationId "com.demon.onekey"
+        minSdkVersion 16
+        targetSdkVersion 29
+        versionCode 13
+        versionName "1.3"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    signingConfigs {
+        sing {
+            storeFile file('your jks')
+            storePassword 'storePassword'
+            keyAlias = 'key'
+            keyPassword 'keyPassword'
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.sing
+        }
+        debug {
+            signingConfig signingConfigs.sing
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: "libs", include: ["*.jar"])
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation 'androidx.core:core-ktx:1.3.0'
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+
+}
+
+task aaBuildApk() {
+
+}
+
+task aaUploadApk(type: Exec) {
+    def applicationId = project.android.defaultConfig.applicationId //包名
+    def api_token = "fir.im的api_token" //fir.im的api_token
+    def filePath = "build/outputs/apk/release/app-release.apk" //apk打包的原始的路径
+    def name = "OneKey" //App名
+    def versionName = project.android.defaultConfig.versionName //版本号
+    def versionCode = project.android.defaultConfig.versionCode //版本Code
+    def jarPath = project.rootDir.toString() + "/BuildApk.jar" //jar的路径
+    commandLine "java", "-jar", "$jarPath", "$applicationId", "$api_token", "$filePath", "$name", "$versionName", "$versionCode"
+}
+
+aaBuildApk.dependsOn('assembleRelease')
+aaUploadApk.dependsOn('clean', 'aaBuildApk')
+aaBuildApk.mustRunAfter('clean')
