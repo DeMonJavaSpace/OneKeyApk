@@ -17,6 +17,10 @@ BuildApk：打包上传到fir.im的Java程序
 2. 配置你的Module的bulid.gradle如下：
 
 ```
+task aaBuildApk() {
+
+}
+
 task aaUploadApk(type: Exec) {
     def applicationId = project.android.defaultConfig.applicationId //包名
     def api_token = "fir.im的api_token" //fir.im的api_token
